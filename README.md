@@ -1,4 +1,4 @@
-# Detecting Lesion Type Using Clustering andDimensionality Reduction
+# Detecting Lesion Type Using Clustering and Dimensionality Reduction
 
 ## Introduction
 
@@ -45,22 +45,23 @@ data from the DeepLesion dataset. The normalized lesion
 location columns were not standardized due to already being
 standardized previously.
 Features we utilized in the DeepLesion data set include:
-• Normalized Lesion Location: This shows where normalized
+- Normalized Lesion Location: This shows where normalized
 coordinates of the location of the lesion in the
 form of a 3D vector. This refers to the relative body
 position of the center of the lesion.
-• Measured Coordinates (in pixels): An 8D vector of the
+- Measured Coordinates (in pixels): An 8D vector of the
 two RECIST diameters of the lesion
-• Lesion Diameter (in pixels): A 2D vector that shows
+- Lesion Diameter (in pixels): A 2D vector that shows
 the lengths of the long and short axes of the lesion.
-• Coarse Lesion Type: The type of the lesion, numbered
+- Coarse Lesion Type: The type of the lesion, numbered
 from 1-8.
-• Bounding Boxes (in pixel): A 4D vector of the coordinates
+- Bounding Boxes (in pixel): A 4D vector of the coordinates
 of the bounding box that cordons off the lesion.
 
 ### Unsupervised Learning
 
-K-means Clustering 
+**K-means Clustering**
+
 From the dataset, the K-Means algorithm
 was run on the Normalized_lesion_location column.
 To prepare the data for the algorithm, the values in each row
@@ -86,26 +87,29 @@ hence, for each data point, we have a probability for it being
 on each cluster. In this project, we select the most probable
 cluster. Now there are two main ways of doing it. The
 first is using the standard version, which uses a to describe
-the different clusters.  The other one is a Bayesian approach, which “allows to infer an approximate posterior distributionover the parameters of a Gaussian mixture distribution.” [3] In our case, there were 7 different clusters from the defini-tion given by the dataset, and as such, we have a more fluidassignment.  In addition, we can also select how the covari-ance will be distributed;  scikit-learn provides the followingoptions:
-•  Full:  each component has its own general covariancematrix
-•  Tied:  all components share the same general covari-ance matrix.
-•  Diagonal:  each  component  has  its  own  diagonal  co-variance matrix
-•  Spherical: each component has its own single variance.
+the different clusters.  The other one is a Bayesian approach, which “allows to infer an approximate posterior distributionover the parameters of a Gaussian mixture distribution.” [3] In our case, there were 7 different clusters from the definition given by the dataset, and as such, we have a more fluid assignment. In addition, we can also select how the covariance will be distributed; scikit-learn provides the following options:
+- Full: each component has its own general covariancematrix
+- Tied: all components share the same general covariance matrix.
+- Diagonal: each component has its own diagonal covariance matrix
+- Spherical: each component has its own single variance.
 
-Bayesian Gaussian Mixture Models 
+**Bayesian Gaussian Mixture Models**
 
 We also created Bayesian Gaussian Mixture Models for the normalized lesion location feature. The Bayesian approach “allows  forus  to  infer  an  approximate  posterior  distribution  over  the parameters  of  a  Gaussian  mixture  distribution.”  We  used a total of 4 different types of covariance matrices here as well, namely the spherical, tied, diagonal and full. The same thing was used to cluster the bounding box feature from theDeepLesion data set.
 ### Dimensionality Reduction
 
-Principal Component Analysis
+**Principal Component Analysis**
 
 We did PCA multiple times using different vector columns in order to find thebest results. We did PCA on the full dataset, measurement coordinates columns, bounding boxes, normalized lesion location, and lesion diameter. First to maximize the variance of the projected data, we calculate the sample mean. Usingthe mean we can center the values in the column by sub-tracting the mean from the data. We obtain the covariancematrix using the numpy covariance function on the transposeof the matrix containing the centered values. From therewe use this covariance matrix to calculate the eigenvaluesand eigenvectors.The eigenvalues and eigenvectors aresorted from largest to smallest value. We can get the amountof variance explained by each component by taking theeigenvalue matrix and dividing it by its sum. We choosethe components to use in the feature vector based on howmuch they make up the explained variance. The data isthen projected into the subspace by multiplying the columns containing the components that we want to use by thedataset. Finally, we visualize the components on a 2d or 1dspace depending on how many components we chose to use,and run clustering methods on the projected data to figureout the cluster relationships.
 
-t-SNE
+**t-SNE**
 
 One way of making dimensionality reduction is using a technique called t-SNE, which stands for t-distributed stochastic neighbor embedding. This method can detect higher dimension structures in the dataset, as "most of the techniques are not capable of retaining both the local and the global structure of the data in a single map." 1000 iterations were then compiled. The algorithm is as follows:
 
-Autoencoders
+
+<img src="https://github.com/cscampana/COGS118B--FinalProject-Deeplesion/blob/main/COGS%20118B%20-%20Graphs/tsne_algorithm.png" width=400>
+
+**Autoencoders**
 
 We also utilized autoencoders for dimensionality reduction of features in the DeepLesion dataset. Autoencoders are artificial neural networks that learn data codings in an unsupervised manner, and we applied that to the data set in order to provide comparison of the visualization in component space as compared to other dimensionality reduction techniques. The keras library was mainly used in the building of the autoencoder.
 
@@ -120,8 +124,36 @@ Finally, we create an autoencoder model with the inputs based on any input recei
 ## Results
 ### Dataset Analysis
 
+(a) Lesion Diameter <br>
+<img src="https://github.com/cscampana/COGS118B--FinalProject-Deeplesion/blob/main/COGS%20118B%20-%20Graphs/diameter_var.png" width=500>
+
+
+
+(b) Measurement Coordinates <br>
+<img src="https://github.com/cscampana/COGS118B--FinalProject-Deeplesion/blob/main/COGS%20118B%20-%20Graphs/measurement_var.png" width=500>
+
+
+
+(c) Normalized_Lesion_Location <br>
+<img src="https://github.com/cscampana/COGS118B--FinalProject-Deeplesion/blob/main/COGS%20118B%20-%20Graphs/lesion_var.png" width=500>
+
+
+(d) Full Dataset <br>
+<img src="https://github.com/cscampana/COGS118B--FinalProject-Deeplesion/blob/main/COGS%20118B%20-%20Graphs/full_dataset_var.png" width=500>
+
+**Fig. 2. Variance Graphs**
+
 ### K-means
-As shown from Figures 3a and 3b, the K-Means algorithm was able to cluster the Normalized_lesion_location with clear cluster outputs. The non-dimensionality reduced data did not perform as well as the data that was reduced from 3 to 2 dimensions. This demonstrates that K-Means does not work well on high dimensional data that has not been reduced in dimensions. However, there is significant improvement in the clusters when PCA is used on the data. 
+As shown from Figures 3a and 3b, the K-Means algorithm was able to cluster the Normalized_lesion_location with clear cluster outputs. The non-dimensionality reduced data did not perform as well as the data that was reduced from 3 to 2 dimensions. This demonstrates that K-Means does not work well on high dimensional data that has not been reduced in dimensions. However, there is significant improvement in the clusters when PCA is used on the data.
+
+(a)  k-Means on normalized_lesion_location <br>
+<img src="https://github.com/cscampana/COGS118B--FinalProject-Deeplesion/blob/main/COGS%20118B%20-%20Graphs/kmeans_3dim.png" width=500>
+
+(b)  k-Means on reduced normalized_lesion_location <br>
+<img src="https://github.com/cscampana/COGS118B--FinalProject-Deeplesion/blob/main/COGS%20118B%20-%20Graphs/kmeans_PCA.png" width=500>
+
+**Fig. 3. Graphs of k-Means**
+
 ### Dimensionality Reduction
 Figures 4a, b and c show the results of running t-SNE. Since the data is visualized in 3D it would seem like the data is all clumped together. However, the data is clustered accordingly by the coarse lesion type. The t-SNE graph with a perplexity value of 5 gives a mean sigma of 7.42 and a KL divergence of 1.18. The t-SNE graph with a perplexity value of 10 gives a mean sigma of 8.45 and a KL divergence of 1.22. The t-SNE graph with a perplexity value of 50 gives a mean sigma of 10.95 and a KL divergence of 1.02.
 
